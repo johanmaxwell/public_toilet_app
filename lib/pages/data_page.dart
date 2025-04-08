@@ -452,6 +452,7 @@ class _DataPageState extends State<DataPage> {
                                   .collection('reminders')
                                   .add({
                                     'fcmToken': fcmToken,
+                                    'gedung': selectedGedung,
                                     'lokasi': selectedToilet,
                                     'gender': widget.gender,
                                     'timestamp': FieldValue.serverTimestamp(),
