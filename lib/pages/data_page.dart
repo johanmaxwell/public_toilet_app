@@ -1,3 +1,6 @@
+// ignore_for_file: use_build_context_synchronously
+
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:public_app/models/toilet_data.dart';
@@ -440,15 +443,56 @@ class _DataPageState extends State<DataPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
-                          onPressed: () {
+                          onPressed: () async {
                             if (selectedToilet != null) {
+                              final fcmToken =
+                                  await FirebaseMessaging.instance.getToken();
+
+                              await FirebaseFirestore.instance
+                                  .collection('reminders')
+                                  .add({
+                                    'fcmToken': fcmToken,
+                                    'lokasi': selectedToilet,
+                                    'gender': widget.gender,
+                                    'timestamp': FieldValue.serverTimestamp(),
+                                  });
+                              if (!mounted) return;
                               Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    "Reminder set for ${StringUtil.snakeToCapitalized(selectedToilet!)}",
-                                  ),
-                                ),
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    title: Row(
+                                      children: const [
+                                        Icon(
+                                          Icons.notifications_active,
+                                          color: Colors.blue,
+                                          size: 30,
+                                        ),
+                                        SizedBox(width: 8),
+                                        Text(
+                                          'Harap Menunggu!',
+                                          style: TextStyle(
+                                            color: Colors.lightGreen,
+                                            fontSize: 25,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    content: Text(
+                                      "Anda akan diberi notifikasi ketika toilet pada ${StringUtil.snakeToCapitalized(selectedToilet!)} telah tersedia.",
+                                      style: TextStyle(fontSize: 15),
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.of(context).pop();
+                                        },
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  );
+                                },
                               );
                             }
                           },
