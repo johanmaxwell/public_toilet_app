@@ -15,6 +15,7 @@ class DataPage extends StatefulWidget {
 class _DataPageState extends State<DataPage> {
   String? selectedGedung;
   late Future<List<String>> gedungFuture;
+  String? selectedRemindFloor;
 
   @override
   void initState() {
@@ -69,7 +70,7 @@ class _DataPageState extends State<DataPage> {
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.only(top: 60, bottom: 30, left: 20, right: 20),
-      margin: EdgeInsets.only(bottom: 15),
+      margin: const EdgeInsets.only(bottom: 15),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors:
@@ -91,9 +92,7 @@ class _DataPageState extends State<DataPage> {
             icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
             onPressed: () => Navigator.pop(context),
           ),
-
           const SizedBox(width: 10),
-
           Container(
             padding: const EdgeInsets.all(10),
             decoration: const BoxDecoration(
@@ -106,9 +105,7 @@ class _DataPageState extends State<DataPage> {
               color: Colors.white,
             ),
           ),
-
           const SizedBox(width: 12),
-
           Expanded(
             child: Text(
               "Toilet ${StringUtil.capitalize(widget.gender)}",
@@ -161,7 +158,9 @@ class _DataPageState extends State<DataPage> {
                           ),
                         ),
                       ),
-                      child: Text(StringUtil.snakeToCapitalized(gedung)),
+                      child: Center(
+                        child: Text(StringUtil.snakeToCapitalized(gedung)),
+                      ),
                     ),
                   ),
                 );
@@ -222,105 +221,273 @@ class _DataPageState extends State<DataPage> {
               visitorFloorMap[data['lokasi']] = data['status'];
             }
 
-            return ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              children:
-                  toiletFloorMap.entries.map((entry) {
-                    final lokasi = entry.key;
-                    final toilets = entry.value;
-                    final visitors = visitorFloorMap[lokasi] ?? '0';
+            return Column(
+              children: [
+                Expanded(
+                  child: ListView(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    children:
+                        toiletFloorMap.entries.map((entry) {
+                          final lokasi = entry.key;
+                          final toilets = entry.value;
+                          final visitors = visitorFloorMap[lokasi] ?? '0';
 
-                    toilets.sort(
-                      (a, b) => int.parse(
-                        a.toiletNumber,
-                      ).compareTo(int.parse(b.toiletNumber)),
-                    );
+                          toilets.sort(
+                            (a, b) => int.parse(
+                              a.toiletNumber,
+                            ).compareTo(int.parse(b.toiletNumber)),
+                          );
 
-                    return Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: ExpansionTile(
-                        title: Text(
-                          '${StringUtil.snakeToCapitalized(lokasi)} ',
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        collapsedBackgroundColor:
-                            widget.gender == 'pria'
-                                ? Colors.purple.shade200
-                                : Colors.red.shade300,
-                        collapsedTextColor: Colors.white,
-                        backgroundColor: Colors.white,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              vertical: 10,
-                              horizontal: 25,
+                          return Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(15),
                             ),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Expanded(
-                                  flex: 4,
-                                  child: Wrap(
-                                    alignment: WrapAlignment.start,
-                                    spacing: 20,
-                                    runSpacing: 12,
-                                    children:
-                                        toilets.map((toilet) {
-                                          return Column(
-                                            mainAxisSize: MainAxisSize.min,
-                                            children: [
-                                              FaIcon(
-                                                FontAwesomeIcons.toilet,
-                                                color:
-                                                    toilet.status == 'occupied'
-                                                        ? Colors.red
-                                                        : Colors.yellow,
-                                                size: 40,
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                "Toilet ${toilet.toiletNumber}",
-                                                style: const TextStyle(
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        }).toList(),
-                                  ),
+                            child: ExpansionTile(
+                              title: Text(
+                                '${StringUtil.snakeToCapitalized(lokasi)} ',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
                                 ),
-                                const Spacer(),
-                                Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    const Icon(
-                                      Icons.people,
-                                      color: Color.fromARGB(255, 53, 53, 53),
-                                      size: 40,
-                                    ),
-                                    const SizedBox(width: 7),
-                                    Text(
-                                      visitors,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w600,
+                              ),
+                              collapsedBackgroundColor:
+                                  widget.gender == 'pria'
+                                      ? Colors.purple.shade200
+                                      : Colors.red.shade300,
+                              collapsedTextColor: Colors.white,
+                              backgroundColor: Colors.white,
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 10,
+                                    horizontal: 25,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Expanded(
+                                        flex: 4,
+                                        child: Wrap(
+                                          alignment: WrapAlignment.start,
+                                          spacing: 20,
+                                          runSpacing: 12,
+                                          children:
+                                              toilets.map((toilet) {
+                                                return Column(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    FaIcon(
+                                                      FontAwesomeIcons.toilet,
+                                                      color:
+                                                          toilet.status ==
+                                                                  'occupied'
+                                                              ? Colors.red
+                                                              : Colors.yellow,
+                                                      size: 40,
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    Text(
+                                                      "Toilet ${toilet.toiletNumber}",
+                                                      style: const TextStyle(
+                                                        fontSize: 14,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                );
+                                              }).toList(),
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const Spacer(),
+                                      Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          const Icon(Icons.people, size: 40),
+                                          const SizedBox(width: 7),
+                                          Text(
+                                            visitors,
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }).toList(),
+                          );
+                        }).toList(),
+                  ),
+                ),
+                _buildRemindMeButton(okupansiSnapshot.data!),
+              ],
             );
           },
         );
       },
     );
+  }
+
+  Widget _buildRemindMeButton(QuerySnapshot snapshot) {
+    return Padding(
+      padding: const EdgeInsets.all(20.0),
+      child: SizedBox(
+        width: double.infinity,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(vertical: 15),
+            backgroundColor:
+                widget.gender == 'pria'
+                    ? Colors.purpleAccent
+                    : Colors.redAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+          ),
+          onPressed: () => _showRemindMePopup(snapshot),
+          child: const Text(
+            "Remind Me",
+            style: TextStyle(fontSize: 18, color: Colors.white),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showRemindMePopup(QuerySnapshot snapshot) {
+    final toiletFull = getToiletFull(snapshot);
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        String? selectedToilet;
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: SizedBox(
+                height: 500,
+                width: 100,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Align(
+                        alignment: Alignment.topRight,
+                        child: IconButton(
+                          icon: const Icon(Icons.close, color: Colors.grey),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                      ),
+                      const Text(
+                        "Pilih toilet:",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      Expanded(
+                        child:
+                            toiletFull.isNotEmpty
+                                ? SingleChildScrollView(
+                                  child: Column(
+                                    children:
+                                        toiletFull.map((floor) {
+                                          return RadioListTile<String>(
+                                            title: Text(
+                                              StringUtil.snakeToCapitalized(
+                                                floor,
+                                              ),
+                                            ),
+                                            value: floor,
+                                            groupValue: selectedToilet,
+                                            onChanged: (value) {
+                                              setState(() {
+                                                selectedToilet = value;
+                                              });
+                                            },
+                                          );
+                                        }).toList(),
+                                  ),
+                                )
+                                : Center(
+                                  child: Text(
+                                    'Tidak ada toilet yang penuh 🙏',
+                                    style: TextStyle(fontSize: 20),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                      ),
+                      const SizedBox(height: 10),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            backgroundColor: Colors.blueAccent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          onPressed: () {
+                            if (selectedToilet != null) {
+                              Navigator.pop(context);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    "Reminder set for ${StringUtil.snakeToCapitalized(selectedToilet!)}",
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            "Select",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  List<String> getToiletFull(QuerySnapshot snapshot) {
+    final listToilet = <String, List<ToiletData>>{};
+
+    for (var doc in snapshot.docs) {
+      final data = ToiletData.fromFirestore(doc.data() as Map<String, dynamic>);
+      listToilet.putIfAbsent(data.lokasi, () => []).add(data);
+    }
+
+    final toiletFull = <String>[];
+
+    for (final entry in listToilet.entries) {
+      final allOccupied = entry.value.every(
+        (toilet) => toilet.status == 'occupied',
+      );
+      if (allOccupied) {
+        toiletFull.add(entry.key);
+      }
+    }
+
+    return toiletFull;
   }
 }
