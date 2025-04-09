@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:public_app/pages/data_page.dart';
+import 'package:public_app/pages/main_page/data_page.dart';
 import 'package:public_app/decoration/page_decoration.dart';
 import 'package:public_app/decoration/fade_in.dart';
 import 'package:public_app/pages/gender_selection/gender_button.dart';
