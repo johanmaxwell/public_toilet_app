@@ -6,6 +6,8 @@ import 'firebase_options.dart';
 import 'package:public_app/pages/gender_selection/gender_selection_page.dart';
 import 'package:public_app/utils/notification_service.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -27,6 +29,7 @@ class PublicApp extends StatelessWidget {
     return MaterialApp(
       title: 'Toilet Monitoring',
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
       home: GenderSelectionPage(),
     );

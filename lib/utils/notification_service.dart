@@ -1,6 +1,8 @@
-import 'dart:io' show Platform;
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:public_app/main.dart';
+import 'package:public_app/pages/gender_selection/gender_selection_page.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin
@@ -16,9 +18,7 @@ class NotificationService {
   static Future<void> init() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-    if (Platform.isIOS) {
-      await messaging.requestPermission(alert: true, badge: true, sound: true);
-    }
+    await messaging.requestPermission(alert: true, badge: true, sound: true);
 
     await _flutterLocalNotificationsPlugin
         .resolvePlatformSpecificImplementation<
@@ -35,6 +35,10 @@ class NotificationService {
     await _flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
+
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      _handleNotificationTap();
+    });
   }
 
   static void _handleForegroundMessage(RemoteMessage message) {
@@ -70,5 +74,12 @@ class NotificationService {
         ),
       );
     }
+  }
+
+  static void _handleNotificationTap() {
+    navigatorKey.currentState?.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const GenderSelectionPage()),
+      (route) => false,
+    );
   }
 }
