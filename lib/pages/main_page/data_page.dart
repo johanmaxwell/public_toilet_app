@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:public_app/models/toilet_data.dart';
@@ -9,8 +7,9 @@ import 'package:public_app/pages/main_page/header.dart';
 import 'package:public_app/pages/main_page/remind_me.dart';
 
 class DataPage extends StatefulWidget {
-  const DataPage({super.key, required this.gender});
   final String gender;
+
+  const DataPage({super.key, required this.gender});
 
   @override
   State<DataPage> createState() => _DataPageState();
