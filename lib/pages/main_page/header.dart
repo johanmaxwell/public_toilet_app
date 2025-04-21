@@ -40,7 +40,7 @@ class DataPageHeader extends StatelessWidget {
               color: Colors.white38,
             ),
             child: Icon(
-              gender.toLowerCase() == 'pria' ? Icons.male : Icons.female,
+              gender == 'pria' ? Icons.male : Icons.female,
               size: 50,
               color: Colors.white,
             ),

@@ -2,7 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:public_app/main.dart';
-import 'package:public_app/pages/gender_selection/gender_selection_page.dart';
+import 'package:public_app/pages/company_selection/company_selection.dart';
 
 class NotificationService {
   static final FlutterLocalNotificationsPlugin
@@ -78,7 +78,7 @@ class NotificationService {
 
   static void _handleNotificationTap() {
     navigatorKey.currentState?.pushAndRemoveUntil(
-      MaterialPageRoute(builder: (_) => const GenderSelectionPage()),
+      MaterialPageRoute(builder: (_) => const CompanySelectionPage()),
       (route) => false,
     );
   }

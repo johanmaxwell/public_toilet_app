@@ -7,9 +7,10 @@ import 'package:public_app/pages/main_page/header.dart';
 import 'package:public_app/pages/main_page/remind_me.dart';
 
 class DataPage extends StatefulWidget {
+  final String company;
   final String gender;
 
-  const DataPage({super.key, required this.gender});
+  const DataPage({super.key, required this.company, required this.gender});
 
   @override
   State<DataPage> createState() => _DataPageState();
@@ -38,7 +39,11 @@ class _DataPageState extends State<DataPage> {
 
   Future<List<String>> fetchGedungList() async {
     final snapshot =
-        await FirebaseFirestore.instance.collection('sensor').get();
+        await FirebaseFirestore.instance
+            .collection('gedung')
+            .doc(widget.company)
+            .collection('daftar')
+            .get();
     return snapshot.docs.map((doc) => doc.id).toList();
   }
 
@@ -83,18 +88,20 @@ class _DataPageState extends State<DataPage> {
     final okupansiStream =
         FirebaseFirestore.instance
             .collection('sensor')
+            .doc(widget.company)
+            .collection(widget.gender)
             .doc(selectedGedung)
             .collection('okupansi')
-            .where('gender', isEqualTo: widget.gender)
             .orderBy('lokasi')
             .snapshots();
 
     final pengunjungStream =
         FirebaseFirestore.instance
             .collection('sensor')
+            .doc(widget.company)
+            .collection(widget.gender)
             .doc(selectedGedung)
             .collection('pengunjung')
-            .where('gender', isEqualTo: widget.gender)
             .snapshots();
 
     return StreamBuilder<QuerySnapshot>(

@@ -2,8 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:public_app/pages/company_selection/company_selection.dart';
 import 'firebase_options.dart';
-import 'package:public_app/pages/gender_selection/gender_selection_page.dart';
 import 'package:public_app/utils/notification_service.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -31,7 +31,7 @@ class PublicApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,
       theme: ThemeData(primarySwatch: Colors.blue, fontFamily: 'Roboto'),
-      home: GenderSelectionPage(),
+      home: CompanySelectionPage(),
     );
   }
 }

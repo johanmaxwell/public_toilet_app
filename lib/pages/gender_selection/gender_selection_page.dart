@@ -6,12 +6,16 @@ import 'package:public_app/decoration/fade_in.dart';
 import 'package:public_app/pages/gender_selection/gender_button.dart';
 
 class GenderSelectionPage extends StatelessWidget {
-  const GenderSelectionPage({super.key});
+  final String company;
+
+  const GenderSelectionPage({super.key, required this.company});
 
   void _navigateToDataPage(BuildContext context, String gender) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => DataPage(gender: gender)),
+      MaterialPageRoute(
+        builder: (context) => DataPage(company: company, gender: gender),
+      ),
     );
   }
 
@@ -28,7 +32,7 @@ class GenderSelectionPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   const Text(
-                    'Selamat Datang!',
+                    'Silakan Pilih!',
                     style: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
