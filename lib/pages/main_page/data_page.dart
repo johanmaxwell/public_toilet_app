@@ -5,6 +5,7 @@ import 'package:public_app/pages/main_page/accordion_list.dart';
 import 'package:public_app/pages/main_page/gedung_dropdown.dart';
 import 'package:public_app/pages/main_page/header.dart';
 import 'package:public_app/pages/main_page/remind_me.dart';
+import 'package:public_app/utils/firebase_usage_monitor.dart';
 
 class DataPage extends StatefulWidget {
   final String company;
@@ -20,6 +21,8 @@ class _DataPageState extends State<DataPage> {
   String? selectedGedung;
   late Future<List<String>> gedungFuture;
   String? selectedRemindFloor;
+
+  late final FirestoreUsageMonitor usageMonitor = FirestoreUsageMonitor();
 
   @override
   void initState() {
@@ -44,6 +47,10 @@ class _DataPageState extends State<DataPage> {
             .doc(widget.company)
             .collection('daftar')
             .get();
+
+    // Track reads
+    usageMonitor.incrementReads(snapshot.docs.length);
+
     return snapshot.docs.map((doc) => doc.id).toList();
   }
 
@@ -111,12 +118,18 @@ class _DataPageState extends State<DataPage> {
           return const Center(child: CircularProgressIndicator());
         }
 
+        // Track reads from the okupansiStream
+        usageMonitor.incrementReads(okupansiSnapshot.data!.docs.length);
+
         return StreamBuilder<QuerySnapshot>(
           stream: pengunjungStream,
           builder: (context, pengunjungSnapshot) {
             if (!pengunjungSnapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
+
+            // Track reads from the pengunjungStream
+            usageMonitor.incrementReads(pengunjungSnapshot.data!.docs.length);
 
             final toiletFloorMap = <String, List<ToiletData>>{};
             for (var doc in okupansiSnapshot.data!.docs) {

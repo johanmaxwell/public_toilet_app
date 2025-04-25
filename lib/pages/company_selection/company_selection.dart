@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:public_app/models/company_data.dart';
 import 'package:public_app/pages/company_selection/company_dropdown.dart';
 import 'package:public_app/pages/gender_selection/gender_selection_page.dart';
+import 'package:public_app/utils/firebase_usage_monitor.dart';
 
 class CompanySelectionPage extends StatefulWidget {
   const CompanySelectionPage({super.key});
@@ -15,6 +16,8 @@ class _CompanySelectionPageState extends State<CompanySelectionPage> {
   String? selectedCompany;
   late Future<List<CompanyData>> companyFuture;
 
+  final FirestoreUsageMonitor usageMonitor = FirestoreUsageMonitor();
+
   @override
   void initState() {
     super.initState();
@@ -25,13 +28,16 @@ class _CompanySelectionPageState extends State<CompanySelectionPage> {
     final List<CompanyData> companyList = [];
     final snapshot =
         await FirebaseFirestore.instance.collection('company').get();
+
+    // Track reads
+    usageMonitor.incrementReads(snapshot.docs.length);
+
     for (var doc in snapshot.docs) {
       final data = doc.data();
       companyList.add(
         CompanyData.fromFirestore(doc.id, data['privacy'], data['kode_akses']),
       );
     }
-
     return companyList;
   }
 
@@ -66,23 +72,46 @@ class _CompanySelectionPageState extends State<CompanySelectionPage> {
                     onChanged: (value) {
                       setState(() {
                         selectedCompany = value;
+
+                        if (selectedCompany != null) {
+                          usageMonitor.updateCompanyId(selectedCompany!);
+                        }
                       });
                     },
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
                     onPressed: () {
+                      if (selectedCompany == null) {
+                        showDialog(
+                          context: context,
+                          builder:
+                              (context) => AlertDialog(
+                                title: const Text('Error'),
+                                content: const Text(
+                                  'Please select a company first.',
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(context),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                        );
+                        return;
+                      }
+
                       final selectedCompanyData = companyData.firstWhere(
                         (company) => company.id == selectedCompany,
                       );
-
                       if (selectedCompanyData.privacy == 'public') {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder:
                                 (context) => GenderSelectionPage(
-                                  company: selectedCompany ?? '',
+                                  company: selectedCompany!,
                                 ),
                           ),
                         );
