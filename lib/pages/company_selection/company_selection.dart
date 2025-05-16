@@ -27,7 +27,10 @@ class _CompanySelectionPageState extends State<CompanySelectionPage> {
   Future<List<CompanyData>> fetchCompanyList() async {
     final List<CompanyData> companyList = [];
     final snapshot =
-        await FirebaseFirestore.instance.collection('company').get();
+        await FirebaseFirestore.instance
+            .collection('company')
+            .where('is_deactivated', isEqualTo: false)
+            .get();
 
     // Track reads
     usageMonitor.incrementReads(snapshot.docs.length);
