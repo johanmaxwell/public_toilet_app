@@ -114,35 +114,43 @@ class _DataPageState extends State<DataPage> {
     return StreamBuilder<QuerySnapshot>(
       stream: okupansiStream,
       builder: (context, okupansiSnapshot) {
-        if (!okupansiSnapshot.hasData) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        // Track reads from the okupansiStream
-        usageMonitor.incrementReads(okupansiSnapshot.data!.docs.length);
-
         return StreamBuilder<QuerySnapshot>(
           stream: pengunjungStream,
           builder: (context, pengunjungSnapshot) {
-            if (!pengunjungSnapshot.hasData) {
+            // Show loading only if both streams are still loading
+            if (!okupansiSnapshot.hasData && !pengunjungSnapshot.hasData) {
               return const Center(child: CircularProgressIndicator());
             }
 
-            // Track reads from the pengunjungStream
-            usageMonitor.incrementReads(pengunjungSnapshot.data!.docs.length);
-
+            // Initialize maps
+            final visitorFloorMap = <String, String>{};
             final toiletFloorMap = <String, List<ToiletData>>{};
-            for (var doc in okupansiSnapshot.data!.docs) {
-              final data = ToiletData.fromFirestore(
-                doc.data() as Map<String, dynamic>,
-              );
-              toiletFloorMap.putIfAbsent(data.lokasi, () => []).add(data);
+
+            // Process pengunjung data if available
+            if (pengunjungSnapshot.hasData) {
+              usageMonitor.incrementReads(pengunjungSnapshot.data!.docs.length);
+              for (var doc in pengunjungSnapshot.data!.docs) {
+                final data = doc.data() as Map<String, dynamic>;
+                visitorFloorMap[data['lokasi']] = data['status'];
+              }
             }
 
-            final visitorFloorMap = <String, String>{};
-            for (var doc in pengunjungSnapshot.data!.docs) {
-              final data = doc.data() as Map<String, dynamic>;
-              visitorFloorMap[data['lokasi']] = data['status'];
+            // Process okupansi data if available
+            if (okupansiSnapshot.hasData) {
+              usageMonitor.incrementReads(okupansiSnapshot.data!.docs.length);
+              for (var doc in okupansiSnapshot.data!.docs) {
+                final data = ToiletData.fromFirestore(
+                  doc.data() as Map<String, dynamic>,
+                );
+                toiletFloorMap.putIfAbsent(data.lokasi, () => []).add(data);
+              }
+            }
+
+            // If we have visitor data but no okupansi data, create empty toilet entries
+            for (var location in visitorFloorMap.keys) {
+              if (!toiletFloorMap.containsKey(location)) {
+                toiletFloorMap[location] = [];
+              }
             }
 
             return Column(
@@ -152,11 +160,13 @@ class _DataPageState extends State<DataPage> {
                   visitorFloorMap: visitorFloorMap,
                   gender: widget.gender,
                 ),
-                RemindMeButton(
-                  gender: widget.gender,
-                  selectedGedung: selectedGedung,
-                  snapshot: okupansiSnapshot.data!,
-                ),
+                if (okupansiSnapshot.hasData)
+                  RemindMeButton(
+                    gender: widget.gender,
+                    company: widget.company,
+                    selectedGedung: selectedGedung,
+                    snapshot: okupansiSnapshot.data!,
+                  ),
               ],
             );
           },

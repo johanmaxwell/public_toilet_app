@@ -6,11 +6,13 @@ import 'package:public_app/utils/string_util.dart';
 
 class RemindMeButton extends StatelessWidget {
   final String gender;
+  final String company;
   final String? selectedGedung;
   final QuerySnapshot snapshot;
 
   const RemindMeButton({
     super.key,
+    required this.company,
     required this.gender,
     required this.selectedGedung,
     required this.snapshot,
@@ -128,10 +130,11 @@ class RemindMeButton extends StatelessWidget {
                               await FirebaseFirestore.instance
                                   .collection('reminders')
                                   .add({
-                                    'fcmToken': fcmToken,
+                                    'fcm_token': fcmToken,
                                     'gedung': selectedGedung,
                                     'lokasi': selectedToilet,
                                     'gender': gender,
+                                    'company': company,
                                     'timestamp': FieldValue.serverTimestamp(),
                                   });
 
